@@ -11,7 +11,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "Nemo", email = "claude@captnemo.in" }]
-keywords = ["http", "curl", "delta-debugging", "ddmin", "har", "bruno", "minimization"]
+keywords = ["http", "curl", "delta-debugging", "ddmin", "har", "minimization"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",

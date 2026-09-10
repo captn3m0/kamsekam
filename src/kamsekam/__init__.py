@@ -8,7 +8,7 @@ from kamsekam.interop import from_httpx2, to_curl, to_httpx2, uncurl
 from kamsekam.minimizer import Minimizer, Result, Stats, minimise, minimize
 from kamsekam.model import Body, HttpRequest, Pair
 from kamsekam.oracle import Oracle, Signature
-from kamsekam.parse import load, parse_bru, parse_curl, parse_har
+from kamsekam.parse import load, parse_curl, parse_har
 from kamsekam.transport import Response, Transport, build_transport
 
 __version__ = "0.1.0"
@@ -34,7 +34,6 @@ __all__ = [
     "load",
     "minimise",
     "minimize",
-    "parse_bru",
     "parse_curl",
     "parse_har",
     "render",

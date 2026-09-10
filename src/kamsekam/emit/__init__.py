@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json as jsonlib
 
-from kamsekam.emit.bru import to_bru
 from kamsekam.emit.code import to_http, to_httpie
 from kamsekam.emit.curl import to_curl
 from kamsekam.emit.har import to_har
@@ -14,13 +13,12 @@ from kamsekam.oracle import Signature
 FORMATS = (
     "curl",
     "har",
-    "bru",
     "httpie",
     "http",
     "json",
 )
 
-__all__ = ["FORMATS", "render", "to_bru", "to_curl", "to_har"]
+__all__ = ["FORMATS", "render", "to_curl", "to_har"]
 
 
 def to_json(request: HttpRequest, signature: Signature | None = None) -> str:
@@ -54,8 +52,6 @@ def render(
         return to_curl(request, impersonate=impersonate, wrap=wrap)
     if fmt == "har":
         return to_har(request, signature=signature)
-    if fmt == "bru":
-        return to_bru(request)
     if fmt == "httpie":
         return to_httpie(request)
     if fmt == "http":

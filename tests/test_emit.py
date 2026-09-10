@@ -3,7 +3,7 @@ import json
 import pytest
 
 from kamsekam.emit import FORMATS, render
-from kamsekam.parse import parse_bru, parse_curl, parse_har
+from kamsekam.parse import parse_curl, parse_har
 
 COMMAND = (
     "curl -X POST 'https://e.test/p?a=1&b=2' "
@@ -55,14 +55,6 @@ def test_har_round_trips(request_obj):
     assert again.method == request_obj.method
     assert again.url == request_obj.url
     assert [p.name for p in again.cookies] == [p.name for p in request_obj.cookies]
-    assert again.body.data == request_obj.body.data
-
-
-def test_bru_round_trips(request_obj):
-    again = parse_bru(render("bru", request_obj))
-    assert again.method == request_obj.method
-    assert again.base_url == request_obj.base_url
-    assert again.header_value("x-key") == "sec ret"
     assert again.body.data == request_obj.body.data
 
 

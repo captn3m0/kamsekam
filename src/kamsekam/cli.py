@@ -77,7 +77,7 @@ def build_parser() -> argparse.ArgumentParser:
         epilog="everything after -- is read as a curl command: kamsekam -- curl -H 'a: b' URL",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("input", nargs="?", help="a .har / .bru / curl file, or - for stdin")
+    parser.add_argument("input", nargs="?", help="a .har or curl file, or - for stdin")
     parser.add_argument("--version", action="version", version=f"kamsekam {__version__}")
 
     out = parser.add_argument_group("output")

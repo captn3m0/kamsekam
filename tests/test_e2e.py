@@ -108,11 +108,11 @@ def test_cli_json_report(endpoint, capsys):
 
 
 def test_cli_multiple_formats(endpoint, capsys):
-    argv = ["--quiet", "--baseline-runs", "1", "--format", "curl,http,bru", "--",
+    argv = ["--quiet", "--baseline-runs", "1", "--format", "curl,http", "--",
             "curl", f"{endpoint}?a=1", "-H", "x-key: secret", "-b", "sid=9f2a"]
     assert main(argv) == 0
     out = capsys.readouterr().out
-    assert "curl " in out and "HTTP/1.1" in out and "meta {" in out
+    assert "curl " in out and "HTTP/1.1" in out
 
 
 def test_cli_dry_run_sends_nothing(capsys):

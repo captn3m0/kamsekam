@@ -13,7 +13,7 @@ uv tool install 'kamsekam[impersonate]' # adds browser impersonation using curl_
 ## Usage
 
 Everything after `--` is parsed as a curl command; the result goes to stdout, the
-report to stderr. Files and stdin work too: `kamsekam f.bru -f httpie`, `... | kamsekam -`.
+report to stderr. Files and stdin work too: `kamsekam req.txt -f httpie`, `... | kamsekam -`.
 
 ```console
 $ kamsekam -- curl 'https://data.services.jetbrains.com/products?code=TC&release.type=eap%2Crc%2Crelease&fields=distributions%2Clink%2Cname%2Creleases&_=1789067502753' \
@@ -69,7 +69,7 @@ kamsekam session.har              # writes session-minimal.har, then -1, -2, ...
 
 | Option | |
 |---|---|
-| `-f, --format` | `curl`, `har`, `bru`, `httpie`, `http`, `json`; comma-separated |
+| `-f, --format` | `curl`, `har`, `httpie`, `http`, `json`; comma-separated |
 | `-o, --output` | write to a file instead of stdout |
 | `--impersonate ID` | replay via [curl_cffi](https://github.com/lexiforest/curl_cffi) with a browser TLS fingerprint |
 | `--match` | signature fields that must hold: `status,type,hash` (default), or `size` when a body embeds a token or timestamp and its sha256 never repeats |
