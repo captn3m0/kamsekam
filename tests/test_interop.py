@@ -1,7 +1,7 @@
 import httpx2
 import pytest
 
-from kamsekam.interop import from_httpx2, to_httpx2
+from kamsekam.interop import from_httpx2, to_curl, to_httpx2, uncurl
 from kamsekam.minimizer import minimise
 from kamsekam.parse import parse_curl
 
@@ -99,3 +99,59 @@ def test_minimise_without_impersonation_omits_the_flag(httpserver):
     result = minimise(request, timeout=10)
     assert result.impersonate is None
     assert "--impersonate" not in result.to_curl()
+
+
+def test_uncurl_returns_a_typed_request():
+    request = uncurl("curl 'https://e.test/x?a=1' -H 'a: b' -b 'sid=1'")
+    assert isinstance(request, httpx2.Request)
+    assert request.method == "GET"
+    assert request.headers["a"] == "b"
+    assert request.headers["cookie"] == "sid=1"
+
+
+def test_uncurl_accepts_argv():
+    request = uncurl(["curl", "-H", "a: b", "https://e.test/"])
+    assert request.headers["a"] == "b"
+
+
+def test_uncurl_keeps_the_body_byte_identical():
+    request = uncurl("""curl https://e.test/ --data-raw '{"z":1, "a":2}'""")
+    assert request.content == b'{"z":1, "a":2}'
+
+
+def test_uncurl_keeps_raw_query_encoding():
+    assert uncurl("curl 'https://e.test/?a=1&b=%20c'").url.query == b"a=1&b=%20c"
+
+
+def test_uncurl_expands_compressed_the_way_curl_does():
+    assert "gzip" in uncurl("curl https://e.test/ --compressed").headers["accept-encoding"]
+
+
+def test_uncurl_can_omit_the_implicit_headers():
+    request = uncurl("curl https://e.test/", implicit_headers=False)
+    assert "user-agent" not in request.headers
+    assert "accept" not in request.headers
+
+
+def test_uncurl_survives_flags_that_break_argparse_parsers():
+    for command in (
+        "curl --url https://e.test/ -H 'a: b'",
+        "curl -G https://e.test/ -d 'a=1'",
+        "curl -sSLk https://e.test/",
+        "curl -I --http2 https://e.test/",
+    ):
+        assert isinstance(uncurl(command), httpx2.Request), command
+
+
+def test_to_curl_round_trips_an_httpx2_request():
+    original = "curl 'https://e.test/x?a=1' -H 'x-k: v' -b 'sid=1'"
+    again = uncurl(to_curl(uncurl(original, implicit_headers=False)), implicit_headers=False)
+    assert again.url.query == b"a=1"
+    assert again.headers["x-k"] == "v"
+    assert again.headers["cookie"] == "sid=1"
+
+
+def test_to_curl_accepts_the_internal_model():
+    from kamsekam.parse import parse_curl
+
+    assert to_curl(parse_curl("curl https://e.test/", implicit_headers=False)).startswith("curl ")

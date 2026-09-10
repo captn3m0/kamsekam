@@ -85,3 +85,20 @@ def test_select_matches_by_pattern():
 def test_no_body_skips_body_atoms():
     assert not [a for a in decompose(parse_curl(COMMAND), include_body=False).atoms
                 if a.kind == "json"]
+
+
+def test_unmodified_json_body_keeps_its_original_bytes():
+    request = parse_curl(
+        """curl https://e.test/ --data-raw '{"z":1, "a":2}'""", implicit_headers=False
+    )
+    decomposition = decompose(request)
+    assert decomposition.rebuild(set(decomposition.ids)).body_bytes() == b'{"z":1, "a":2}'
+
+
+def test_modified_json_body_is_reserialised():
+    request = parse_curl(
+        """curl https://e.test/ --data-raw '{"z":1, "a":2}'""", implicit_headers=False
+    )
+    decomposition = decompose(request)
+    keep = set(decomposition.ids) - {"json:$.z"}
+    assert decomposition.rebuild(keep).body_bytes() == b'{"a":2}'

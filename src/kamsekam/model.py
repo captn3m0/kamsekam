@@ -113,10 +113,20 @@ class Body:
         if self.kind == "form":
             return "&".join(p.raw for p in self.fields).encode()
         if self.kind == "json":
-            return jsonlib.dumps(self.data, separators=(",", ":")).encode()
+            return self._render_json()
         if self.kind == "multipart":
             return self._render_multipart()
         return self.raw
+
+    def _render_json(self) -> bytes:
+        """Emit the original bytes while the data still matches them, so nothing drifts."""
+        if self.raw:
+            try:
+                if jsonlib.loads(self.raw) == self.data:
+                    return self.raw
+            except ValueError:
+                pass
+        return jsonlib.dumps(self.data, separators=(",", ":")).encode()
 
     def _render_multipart(self) -> bytes:
         out = bytearray()

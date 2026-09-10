@@ -91,7 +91,8 @@ class Decomposition:
             kept = [p for atom_id, p in self._fields if atom_id in enabled]
             return Body(kind=original.kind, fields=kept)
         if original.kind == "json" and self._json:
-            return Body(kind="json", data=_filter_json(original.data, (), enabled, self._json))
+            data = _filter_json(original.data, (), enabled, self._json)
+            return Body(kind="json", data=data, raw=original.raw)
         if self._body_atom is not None and self._body_atom not in enabled:
             return None
         return original

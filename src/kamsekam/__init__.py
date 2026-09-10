@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from kamsekam.atoms import Atom, Decomposition, decompose
 from kamsekam.emit import FORMATS, render
-from kamsekam.interop import from_httpx2, to_httpx2
+from kamsekam.interop import from_httpx2, to_curl, to_httpx2, uncurl
 from kamsekam.minimizer import Minimizer, Result, Stats, minimise, minimize
 from kamsekam.model import Body, HttpRequest, Pair
 from kamsekam.oracle import Oracle, Signature
@@ -38,5 +38,7 @@ __all__ = [
     "parse_curl",
     "parse_har",
     "render",
+    "to_curl",
     "to_httpx2",
+    "uncurl",
 ]

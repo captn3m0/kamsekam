@@ -13,9 +13,8 @@ uv tool install 'kamsekam[impersonate]' # adds TLS fingerprinting
 
 ## Usage
 
-Everything after `--` is parsed as a curl command; the result goes to stdout and
-the report to stderr. Files and stdin work too: `kamsekam request.bru -f httpie`,
-`cat command.txt | kamsekam -`.
+Everything after `--` is parsed as a curl command; the result goes to stdout, the
+report to stderr. Files and stdin work too: `kamsekam f.bru -f httpie`, `... | kamsekam -`.
 
 ```console
 $ kamsekam -- curl 'https://api.example.com/v1/me?verbose=1' \
@@ -35,19 +34,17 @@ curl 'https://api.example.com/v1/me' -H 'authorization: Bearer eyJhbG...' -b 'si
    header (`Accept: a, b, c` gives three), each cookie, each query parameter,
    and each form field or top-level JSON key.
 3. Delta debugging removes subsets of atoms and replays, keeping any removal
-   that leaves the signature unchanged.
-4. The survivors are rendered in the requested output formats.
+   that leaves the signature unchanged, then renders what survived.
 
 The algorithm is ddmin (Zeller & Hildebrandt) with partitions balanced by each
 atom's serialised byte length rather than count, so large atoms are isolated in
-earlier rounds; a final heaviest-first pass makes the result 1-minimal. It
-sends the request tens to hundreds of times, so use it only on idempotent
-requests.
+earlier rounds; a final heaviest-first pass makes the result 1-minimal. It sends
+the request hundreds of times, so use it only on idempotent requests.
 
 ## HAR archives
 
 With a HAR file and no `--format` override, every `GET` entry is minimised in
-place and the rest of the archive copied unchanged.
+place, the rest of the archive copied unchanged.
 
 ```console
 kamsekam -o minimal.har session.har
@@ -68,17 +65,19 @@ kamsekam session.har              # writes session-minimal.har, then -1, -2, ...
 | `--dry-run` | list atoms and exit without sending anything |
 
 An unstable baseline is detected and `--match` relaxed automatically. Run
-`kamsekam --help` for the remaining flags.
+`kamsekam --help` for the rest.
 
 ## Library
 
 Requests cross the API boundary as typed [httpx2](https://github.com/pydantic/httpx2)
-objects; Python has no equivalent of PHP's PSR-7. `minimise()` also accepts a
-curl command string and takes the same options as the CLI, `impersonate` included.
+objects; Python has no equivalent of PHP's PSR-7. `minimise()` also accepts a curl
+string and takes the CLI's options. `uncurl()` is the parser on its own.
 
 ```python
 import httpx2
-from kamsekam import minimise
+from kamsekam import minimise, to_curl, uncurl
+
+uncurl("curl https://e.test -H 'a: b' --compressed")   # -> httpx2.Request; to_curl() reverses it
 
 result = minimise(httpx2.Request("GET", url, headers={"x-a": "1"}), impersonate="chrome131")
 result.as_httpx2()   # httpx2.Request, minimised
@@ -90,9 +89,10 @@ result.to_curl()     # command string; also result.kept / .removed / .stats
 Chrome and Firefox `Copy as cURL` output parses as-is, including `--compressed`,
 `--data-raw` and `$'...'` strings. Redirects are not followed unless the command
 passes `-L`. Requests are sent with exactly the headers given, plus `Host` and
-`Content-Length`. Prior art: [minreq](https://pypi.org/project/minreq/) (2015,
-Python 2) applied the same idea to Copy as cURL, testing each field once against
-the full request, reporting individually-required fields, not a minimal set.
+`Content-Length`. Bodies are replayed byte-for-byte; a JSON body is only
+re-serialised once a key has actually been removed. Prior art:
+[minreq](https://pypi.org/project/minreq/) (2015, Python 2) tested each field
+once against the full request, reporting individually-required fields.
 
 ## License
 

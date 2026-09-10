@@ -7,8 +7,9 @@ from urllib.parse import urlsplit, urlunsplit
 import httpx2
 
 from kamsekam.model import Body, HttpRequest, Pair, classify_body
+from kamsekam.parse.curl import parse_curl
 
-__all__ = ["from_httpx2", "to_httpx2"]
+__all__ = ["from_httpx2", "to_curl", "to_httpx2", "uncurl"]
 
 
 def to_httpx2(request: HttpRequest) -> httpx2.Request:
@@ -50,3 +51,14 @@ def from_httpx2(request: httpx2.Request) -> HttpRequest:
         cookies=cookies,
         body=body,
     )
+
+
+def uncurl(command: str | list[str], implicit_headers: bool = True) -> httpx2.Request:
+    """Parse a curl command, or an already-split argv, into a typed httpx2.Request."""
+    return to_httpx2(parse_curl(command, implicit_headers=implicit_headers))
+
+
+def to_curl(request: httpx2.Request | HttpRequest, impersonate: str | None = None) -> str:
+    """Render an httpx2.Request, or the internal model, back into a curl command."""
+    internal = request if isinstance(request, HttpRequest) else from_httpx2(request)
+    return internal.to_curl(impersonate=impersonate)
