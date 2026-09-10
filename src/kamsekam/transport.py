@@ -18,7 +18,6 @@ class Response:
     reason: str
     content_type: str
     body: bytes
-    elapsed: float
 
 
 class TransportError(RuntimeError):
@@ -80,7 +79,6 @@ class Httpx2Transport(Transport):
         return client
 
     def _send(self, request: HttpRequest) -> Response:
-        started = time.monotonic()
         response = self._client(request).send(
             to_httpx2(request), follow_redirects=request.follow_redirects
         )
@@ -89,7 +87,6 @@ class Httpx2Transport(Transport):
             reason=response.reason_phrase or "",
             content_type=response.headers.get("content-type", ""),
             body=response.content,
-            elapsed=time.monotonic() - started,
         )
 
     def close(self) -> None:
@@ -115,7 +112,6 @@ class CurlCffiTransport(Transport):
         )
 
     def _send(self, request: HttpRequest) -> Response:
-        started = time.monotonic()
         response = self.session.request(
             cast("Any", request.method),
             request.url,
@@ -131,7 +127,6 @@ class CurlCffiTransport(Transport):
             reason=getattr(response, "reason", "") or "",
             content_type=response.headers.get("content-type", ""),
             body=response.content,
-            elapsed=time.monotonic() - started,
         )
 
     def close(self) -> None:

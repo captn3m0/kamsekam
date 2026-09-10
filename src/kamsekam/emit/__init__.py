@@ -5,15 +5,7 @@ from __future__ import annotations
 import json as jsonlib
 
 from kamsekam.emit.bru import to_bru
-from kamsekam.emit.code import (
-    to_fetch,
-    to_http,
-    to_httpie,
-    to_httpx,
-    to_powershell,
-    to_requests,
-    to_wget,
-)
+from kamsekam.emit.code import to_http, to_httpie
 from kamsekam.emit.curl import to_curl
 from kamsekam.emit.har import to_har
 from kamsekam.model import HttpRequest
@@ -24,11 +16,6 @@ FORMATS = (
     "har",
     "bru",
     "httpie",
-    "requests",
-    "httpx",
-    "fetch",
-    "wget",
-    "powershell",
     "http",
     "json",
 )
@@ -71,16 +58,6 @@ def render(
         return to_bru(request)
     if fmt == "httpie":
         return to_httpie(request)
-    if fmt == "requests":
-        return to_requests(request)
-    if fmt == "httpx":
-        return to_httpx(request)
-    if fmt == "fetch":
-        return to_fetch(request)
-    if fmt == "wget":
-        return to_wget(request)
-    if fmt == "powershell":
-        return to_powershell(request)
     if fmt == "http":
         return to_http(request)
     if fmt == "json":

@@ -8,40 +8,12 @@ from typing import Any
 from urllib.parse import quote, unquote_plus, urlsplit, urlunsplit
 
 LIST_HEADERS = frozenset(
-    {
-        "accept",
-        "accept-charset",
-        "accept-encoding",
-        "accept-language",
-        "accept-patch",
-        "accept-post",
-        "access-control-request-headers",
-        "allow",
-        "cache-control",
-        "clear-site-data",
-        "connection",
-        "content-encoding",
-        "content-language",
-        "expect",
-        "forwarded",
-        "if-match",
-        "if-none-match",
-        "permissions-policy",
-        "pragma",
-        "prefer",
-        "sec-ch-ua",
-        "sec-ch-ua-form-factors",
-        "sec-ch-ua-full-version-list",
-        "te",
-        "trailer",
-        "transfer-encoding",
-        "upgrade",
-        "vary",
-        "via",
-        "want-digest",
-        "warning",
-        "x-forwarded-for",
-    }
+    "accept accept-charset accept-encoding accept-language accept-patch accept-post "
+    "access-control-request-headers allow cache-control clear-site-data connection "
+    "content-encoding content-language expect forwarded if-match if-none-match permissions-policy "
+    "pragma prefer sec-ch-ua sec-ch-ua-form-factors sec-ch-ua-full-version-list te trailer "
+    "transfer-encoding upgrade vary via want-digest warning x-forwarded-for"
+    .split()
 )
 
 MULTIPART_BOUNDARY = "----kamsekamFormBoundary7MA4YWxkTrZu0gW"

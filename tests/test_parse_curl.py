@@ -100,3 +100,22 @@ def test_no_url_raises():
 def test_content_length_is_dropped():
     request = parse("curl -H 'Content-Length: 99' https://e.test/ -d x=1")
     assert request.header_value("content-length") is None
+
+
+def test_range_becomes_a_range_header():
+    assert parse("curl -r 0-1023 https://e.test/").header_value("range") == "bytes=0-1023"
+    assert parse("curl --range 500- https://e.test/").header_value("range") == "bytes=500-"
+
+
+def test_range_with_an_explicit_unit_is_passed_through():
+    assert parse("curl -r items=1-2 https://e.test/").header_value("range") == "items=1-2"
+
+
+def test_unknown_flags_do_not_swallow_the_url():
+    for command in (
+        "curl --future-thing https://e.test/x",
+        "curl --shiny-new https://e.test/x -H 'a: b'",
+        "curl --a --b https://e.test/x",
+        "curl --future-thing e.test/x",
+    ):
+        assert "e.test/x" in parse(command).base_url, command

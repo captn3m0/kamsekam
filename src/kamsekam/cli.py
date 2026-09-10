@@ -6,6 +6,7 @@ import argparse
 import json as jsonlib
 import os
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 from kamsekam import __version__
@@ -16,7 +17,7 @@ from kamsekam.archive import (
     load_document,
     minimise_document,
 )
-from kamsekam.atoms import Decomposition, decompose
+from kamsekam.atoms import Atom, Decomposition, decompose
 from kamsekam.emit import FORMATS, render
 from kamsekam.minimizer import Minimizer, Result
 from kamsekam.model import HttpRequest
@@ -38,19 +39,19 @@ class Printer:
     def paint(self, text: str, code: str) -> str:
         return f"\033[{code}m{text}\033[0m" if self.colour else text
 
-    def line(self, label: str, text: str) -> None:
-        if self.quiet:
-            return
+    def _emit(self, label: str, colour: str, text: str) -> None:
         self.clear()
-        print(f"  {self.paint(label.ljust(9), '1;36')} {text}", file=sys.stderr)
+        print(f"  {self.paint(label.ljust(9), colour)} {text}", file=sys.stderr)
+
+    def line(self, label: str, text: str) -> None:
+        if not self.quiet:
+            self._emit(label, "1;36", text)
 
     def warn(self, text: str) -> None:
-        self.clear()
-        print(f"  {self.paint('warning', '1;33')}  {text}", file=sys.stderr)
+        self._emit("warning", "1;33", text)
 
     def error(self, text: str) -> None:
-        self.clear()
-        print(f"  {self.paint('error', '1;31')}    {text}", file=sys.stderr)
+        self._emit("error", "1;31", text)
 
     def blank(self) -> None:
         if not self.quiet:
@@ -226,46 +227,34 @@ def _atom_lines(result: Result, printer: Printer) -> None:
     printer.blank()
 
 
-def _report_json(result: Result, rendered: dict[str, str], match: tuple[str, ...]) -> str:
-    return jsonlib.dumps(
-        {
-            "baseline": _baseline_json(result, match),
-            "atoms": _atoms_json(result),
-            "stats": _stats_json(result),
-            "output": rendered,
+def _atom_json(atom: Atom) -> dict[str, str]:
+    return {"id": atom.id, "kind": atom.kind, "label": atom.label}
+
+
+def _result_json(result: Result, match: tuple[str, ...]) -> dict[str, object]:
+    stats = asdict(result.stats)
+    stats["requests"] = stats.pop("requests_made")
+    stats["bytes_saved"] = result.bytes_saved
+    return {
+        "baseline": {
+            "status": result.baseline.status,
+            "content_type": result.baseline.content_type,
+            "size": result.baseline.size,
+            "sha256": result.baseline.digest,
+            "match": list(match),
         },
-        indent=2,
-    )
-
-
-def _baseline_json(result: Result, match: tuple[str, ...]) -> dict[str, object]:
-    return {
-        "status": result.baseline.status,
-        "content_type": result.baseline.content_type,
-        "size": result.baseline.size,
-        "sha256": result.baseline.digest,
-        "match": list(match),
+        "atoms": {
+            "total": len(result.kept) + len(result.removed) + len(result.pinned),
+            "kept": [_atom_json(a) for a in result.kept],
+            "pinned": [a.id for a in result.pinned],
+            "removed": [_atom_json(a) for a in result.removed],
+        },
+        "stats": stats,
     }
 
 
-def _atoms_json(result: Result) -> dict[str, object]:
-    return {
-        "total": len(result.kept) + len(result.removed) + len(result.pinned),
-        "kept": [{"id": a.id, "kind": a.kind, "label": a.label} for a in result.kept],
-        "pinned": [a.id for a in result.pinned],
-        "removed": [{"id": a.id, "kind": a.kind, "label": a.label} for a in result.removed],
-    }
-
-
-def _stats_json(result: Result) -> dict[str, object]:
-    return {
-        "requests": result.stats.requests_made,
-        "tests": result.stats.tests,
-        "cache_hits": result.stats.cache_hits,
-        "rounds": result.stats.rounds,
-        "transport_failures": result.stats.transport_failures,
-        "bytes_saved": result.bytes_saved,
-    }
+def _report_json(result: Result, rendered: dict[str, str], match: tuple[str, ...]) -> str:
+    return jsonlib.dumps(_result_json(result, match) | {"output": rendered}, indent=2)
 
 
 def _resolve_entry(raw: str | None) -> int | str | None:
@@ -345,22 +334,9 @@ def _archive_json(
     return {
         "output": str(destination),
         "entries": [
-            {
-                "index": o.index,
-                "method": o.method,
-                "url": o.url,
-                "state": o.state,
-                "detail": o.detail,
-                **(
-                    {
-                        "baseline": _baseline_json(o.result, match),
-                        "atoms": _atoms_json(o.result),
-                        "stats": _stats_json(o.result),
-                    }
-                    if o.result is not None
-                    else {}
-                ),
-            }
+            {"index": o.index, "method": o.method, "url": o.url,
+             "state": o.state, "detail": o.detail}
+            | (_result_json(o.result, match) if o.result is not None else {})
             for o in outcomes
         ],
     }

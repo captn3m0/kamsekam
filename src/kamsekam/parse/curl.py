@@ -13,94 +13,26 @@ from kamsekam.parse.shell import tokenize
 IMPLICIT_USER_AGENT = "curl/8.7.1"
 COMPRESSED_ENCODINGS = "gzip, deflate, br, zstd"
 
-_NO_ARG = {
-    "--compressed",
-    "--compressed-ssh",
-    "--create-dirs",
-    "--fail",
-    "--fail-early",
-    "--fail-with-body",
-    "--get",
-    "--globoff",
-    "--head",
-    "--http0.9",
-    "--http1.0",
-    "--http1.1",
-    "--http2",
-    "--http2-prior-knowledge",
-    "--http3",
-    "--http3-only",
-    "--include",
-    "--insecure",
-    "--ipv4",
-    "--ipv6",
-    "--junk-session-cookies",
-    "--list-only",
-    "--location",
-    "--location-trusted",
-    "--no-alpn",
-    "--no-buffer",
-    "--no-keepalive",
-    "--no-progress-meter",
-    "--no-sessionid",
-    "--path-as-is",
-    "--post301",
-    "--post302",
-    "--post303",
-    "--progress-bar",
-    "--raw",
-    "--remote-name",
-    "--remote-time",
-    "--show-error",
-    "--silent",
-    "--ssl",
-    "--ssl-no-revoke",
-    "--ssl-reqd",
-    "--tcp-nodelay",
-    "--tlsv1",
-    "--tlsv1.0",
-    "--tlsv1.1",
-    "--tlsv1.2",
-    "--tlsv1.3",
-    "--trace-time",
-    "--verbose",
-    "--xattr",
-}
+_NO_ARG = frozenset(
+    "--compressed --compressed-ssh --create-dirs --fail --fail-early --fail-with-body --get "
+    "--globoff --head --http0.9 --http1.0 --http1.1 --http2 --http2-prior-knowledge --http3 "
+    "--http3-only --include --insecure --ipv4 --ipv6 --junk-session-cookies --list-only "
+    "--location --location-trusted --no-alpn --no-buffer --no-keepalive --no-progress-meter "
+    "--no-sessionid --path-as-is --post301 --post302 --post303 --progress-bar --raw --remote-name "
+    "--remote-time --show-error --silent --ssl --ssl-no-revoke --ssl-reqd --tcp-nodelay --tlsv1 "
+    "--tlsv1.0 --tlsv1.1 --tlsv1.2 --tlsv1.3 --trace-time --verbose --xattr"
+    .split()
+)
 
 _SHORT_NO_ARG = set("46IJkLOSsvi#")
 
-_TAKES_ARG = {
-    "--connect-timeout",
-    "--cookie",
-    "--cookie-jar",
-    "--data",
-    "--data-ascii",
-    "--data-binary",
-    "--data-raw",
-    "--data-urlencode",
-    "--form",
-    "--form-string",
-    "--header",
-    "--json",
-    "--limit-rate",
-    "--max-filesize",
-    "--max-redirs",
-    "--max-time",
-    "--oauth2-bearer",
-    "--output",
-    "--proxy",
-    "--proxy-user",
-    "--range",
-    "--referer",
-    "--request",
-    "--resolve",
-    "--retry",
-    "--upload-file",
-    "--url",
-    "--user",
-    "--user-agent",
-    "--write-out",
-}
+_TAKES_ARG = frozenset(
+    "--connect-timeout --cookie --cookie-jar --data --data-ascii --data-binary --data-raw "
+    "--data-urlencode --form --form-string --header --json --limit-rate --max-filesize "
+    "--max-redirs --max-time --oauth2-bearer --output --proxy --proxy-user --range --referer "
+    "--request --resolve --retry --upload-file --url --user --user-agent --write-out"
+    .split()
+)
 
 _SHORT_TO_LONG = {
     "A": "--user-agent",
@@ -138,6 +70,7 @@ class _Options:
     def __init__(self) -> None:
         self.method: str | None = None
         self.urls: list[str] = []
+        self.maybe_urls: list[str] = []
         self.headers: list[tuple[str, str]] = []
         self.suppressed: set[str] = set()
         self.cookies: list[str] = []
@@ -164,6 +97,8 @@ def _consume(opts: _Options, flag: str, value: str | None) -> None:
         opts.headers.append(("User-Agent", value or ""))
     elif flag == "--referer":
         opts.headers.append(("Referer", value or ""))
+    elif flag == "--range" and value:
+        opts.headers.append(("Range", value if "=" in value else f"bytes={value}"))
     elif flag == "--cookie":
         assert value is not None
         if "=" in value:
@@ -247,6 +182,7 @@ def _parse_tokens(tokens: list[str]) -> _Options:
             elif flag.startswith("--no-") or sep:
                 continue
             elif i < len(tokens) and not tokens[i].startswith("-"):
+                opts.maybe_urls.append(tokens[i])
                 i += 1
         elif token.startswith("-") and len(token) > 1:
             j = 1
@@ -318,6 +254,9 @@ def parse_curl(command: str | list[str], implicit_headers: bool = True) -> HttpR
     if not tokens:
         raise CurlParseError("empty curl command")
     opts = _parse_tokens(tokens)
+    if not opts.urls and opts.maybe_urls:
+        with_scheme = [u for u in opts.maybe_urls if "://" in u]
+        opts.urls = with_scheme[:1] or opts.maybe_urls[:1]
     if not opts.urls:
         raise CurlParseError("no URL found in curl command")
 

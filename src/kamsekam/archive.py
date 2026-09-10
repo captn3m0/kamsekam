@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from kamsekam.emit.har import har_request_dict
 from kamsekam.minimizer import Result
 from kamsekam.model import HttpRequest
 from kamsekam.parse.har import parse_har
@@ -35,28 +36,6 @@ def derive_output_path(source: str | Path, suffix: str = "-minimal") -> Path:
         candidate = path.with_name(f"{stem}{suffix}-{counter}.har")
         counter += 1
     return candidate
-
-
-def har_request_dict(request: HttpRequest, http_version: str = "HTTP/1.1") -> dict[str, Any]:
-    """Serialise back into the HAR request shape, ready to drop into an entry."""
-    payload = request.body_bytes()
-    headers = [{"name": name, "value": value} for name, value in request.wire_headers()]
-    document: dict[str, Any] = {
-        "method": request.method,
-        "url": request.url,
-        "httpVersion": http_version,
-        "cookies": [{"name": p.name, "value": p.value} for p in request.cookies],
-        "headers": headers,
-        "queryString": [{"name": p.name, "value": p.value} for p in request.query],
-        "headersSize": -1,
-        "bodySize": len(payload) if payload else 0,
-    }
-    if payload is not None:
-        document["postData"] = {
-            "mimeType": request.header_value("content-type") or "application/octet-stream",
-            "text": payload.decode("utf-8", "replace"),
-        }
-    return document
 
 
 def load_document(text: str) -> dict[str, Any]:

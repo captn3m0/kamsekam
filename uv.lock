@@ -268,15 +268,6 @@ wheels = [
 ]
 
 [[package]]
-name = "harfile"
-version = "0.5.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8a/0e/ffbb98cd1910f1f898ddc62d649dbf0e3d68026ee9313d3cff035206b727/harfile-0.5.0.tar.gz", hash = "sha256:c1524b8f0a39dd9f19365760aefb3adbba951818310d17b2eaa293de1f4c170a", size = 10293, upload-time = "2026-05-29T11:50:03.358Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/21/949c004d730d610dac63bcf5964f2585e98aa7bd44ff570ef8844472e76b/harfile-0.5.0-py3-none-any.whl", hash = "sha256:ab8a01d0d21d3b7f5ad57e7dc56b8b829f6a8855c1fa143aad464e7e8169f5e3", size = 7172, upload-time = "2026-05-29T11:50:02.206Z" },
-]
-
-[[package]]
 name = "httpcore2"
 version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
@@ -338,7 +329,6 @@ name = "kamsekam"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "harfile" },
     { name = "httpx2" },
 ]
 
@@ -358,7 +348,6 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "curl-cffi", marker = "extra == 'impersonate'", specifier = ">=0.7" },
-    { name = "harfile", specifier = ">=0.4" },
     { name = "httpx2", specifier = ">=2.12.0" },
 ]
 provides-extras = ["impersonate"]

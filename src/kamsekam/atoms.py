@@ -54,9 +54,6 @@ class Decomposition:
     def ids(self) -> list[str]:
         return [a.id for a in self.atoms]
 
-    def by_id(self, atom_id: str) -> Atom:
-        return next(a for a in self.atoms if a.id == atom_id)
-
     def select(self, patterns: list[str]) -> set[str]:
         return {a.id for a in self.atoms for p in patterns if a.matches(p)}
 

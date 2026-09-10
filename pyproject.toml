@@ -22,7 +22,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "harfile>=0.4",
     "httpx2>=2.12.0",
 ]
 
@@ -45,6 +44,10 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/kamsekam/model.py" = ["SIM905"]
+"src/kamsekam/parse/curl.py" = ["SIM905"]
 
 [tool.mypy]
 python_version = "3.10"

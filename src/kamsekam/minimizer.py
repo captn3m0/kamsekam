@@ -48,11 +48,6 @@ class Result:
 
         return to_httpx2(self.request)
 
-    def original_as_httpx2(self) -> httpx2.Request:
-        from kamsekam.interop import to_httpx2
-
-        return to_httpx2(self.original)
-
     def to_curl(self) -> str:
         return self.request.to_curl(impersonate=self.impersonate)
 

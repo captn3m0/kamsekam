@@ -1,14 +1,13 @@
 # kamsekam
 
 Finds the smallest version of an HTTP request that still produces the same
-response. Takes a curl command, HAR file or Bruno `.bru` file, replays it while
-removing parts, and prints what is left.
+response. Takes a request, replays it while removing parts, and prints what is left.
 
 ## Install
 
 ```console
 uv tool install kamsekam                # the kamsekam command
-uv tool install 'kamsekam[impersonate]' # adds TLS fingerprinting
+uv tool install 'kamsekam[impersonate]' # adds browser impersonation using curl_cffi
 ```
 
 ## Usage
@@ -17,13 +16,30 @@ Everything after `--` is parsed as a curl command; the result goes to stdout, th
 report to stderr. Files and stdin work too: `kamsekam f.bru -f httpie`, `... | kamsekam -`.
 
 ```console
-$ kamsekam -- curl 'https://api.example.com/v1/me?verbose=1' \
-    -H 'authorization: Bearer eyJhbG...' \
-    -b 'sid=9f2a; theme=dark; _ga=GA1.2.99'
-  baseline  200 application/json 1483B sha256:6b86b2...
-  minimised 41 requests · 18 atoms -> 2 · 1194 bytes saved
+$ kamsekam -- curl 'https://data.services.jetbrains.com/products?code=TC&release.type=eap%2Crc%2Crelease&fields=distributions%2Clink%2Cname%2Creleases&_=1789067502753' \
+  --compressed \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0' \
+  -H 'Accept: */*' \
+  -H 'Accept-Language: en' \
+  -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+  -H 'Origin: https://www.jetbrains.com' \
+  -H 'DNT: 1' \
+  -H 'Sec-GPC: 1' \
+  -H 'Connection: keep-alive' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'Priority: u=4' \
+  -H 'TE: trailers'
+  input     GET https://data.services.jetbrains.com/products · 20 atoms · 503 bytes
+  baseline  200 application/json 176949B sha256:67308c6c7677
+  minimised 21 requests · 20 atoms → 2 · 388 bytes saved
 
-curl 'https://api.example.com/v1/me' -H 'authorization: Bearer eyJhbG...' -b 'sid=9f2a'
+    keep  query:code                   ?code=TC
+    keep  query:fields                 ?fields=distributions%2Clink%2Cname%2Creleases
+    drop  18 removed: header:user-agent, header:accept, header:accept-language, header:accept-encoding[0], header:accept-encoding[1], header:accept-encoding[2], header:accept-encoding[3], header:origin, header:dnt, header:sec-gpc, header:connection, header:sec-fetch-dest, header:sec-fetch-mode, header:sec-fetch-site, header:priority, header:te, query:release.type, query:_
+
+curl 'https://data.services.jetbrains.com/products?code=TC&fields=distributions%2Clink%2Cname%2Creleases'
 ```
 
 ## How it works
@@ -36,9 +52,7 @@ curl 'https://api.example.com/v1/me' -H 'authorization: Bearer eyJhbG...' -b 'si
 3. Delta debugging removes subsets of atoms and replays, keeping any removal
    that leaves the signature unchanged, then renders what survived.
 
-The algorithm is ddmin (Zeller & Hildebrandt) with partitions balanced by each
-atom's serialised byte length rather than count, so large atoms are isolated in
-earlier rounds; a final heaviest-first pass makes the result 1-minimal. It sends
+The algorithm is ddmin (Zeller & Hildebrandt) [^1]. It sends
 the request hundreds of times, so use it only on idempotent requests.
 
 ## HAR archives
@@ -55,13 +69,12 @@ kamsekam session.har              # writes session-minimal.har, then -1, -2, ...
 
 | Option | |
 |---|---|
-| `-f, --format` | `curl`, `har`, `bru`, `httpie`, `requests`, `httpx`, `fetch`, `wget`, `powershell`, `http`, `json`; comma-separated |
+| `-f, --format` | `curl`, `har`, `bru`, `httpie`, `http`, `json`; comma-separated |
 | `-o, --output` | write to a file instead of stdout |
 | `--impersonate ID` | replay via [curl_cffi](https://github.com/lexiforest/curl_cffi) with a browser TLS fingerprint |
 | `--match` | signature fields that must hold: `status,type,hash` (default), or `size` when a body embeds a token or timestamp and its sha256 never repeats |
 | `--baseline-runs N` | baseline replays used to detect unstable responses (default 2) |
 | `--keep PATTERN` | never remove matching atoms, e.g. `--keep 'header:authorization'` |
-| `--entry N\|TEXT` | restrict a HAR archive to one entry |
 | `--dry-run` | list atoms and exit without sending anything |
 
 An unstable baseline is detected and `--match` relaxed automatically. Run
@@ -86,13 +99,13 @@ result.to_curl()     # command string; also result.kept / .removed / .stats
 
 ## Notes
 
-Chrome and Firefox `Copy as cURL` output parses as-is, including `--compressed`,
-`--data-raw` and `$'...'` strings. Redirects are not followed unless the command
-passes `-L`. Requests are sent with exactly the headers given, plus `Host` and
-`Content-Length`. Bodies are replayed byte-for-byte; a JSON body is only
-re-serialised once a key has actually been removed. Prior art:
-[minreq](https://pypi.org/project/minreq/) (2015, Python 2) tested each field
-once against the full request, reporting individually-required fields.
+All 272 flags of curl 8.22 parse, including `--compressed`, `--data-raw` and
+`$'...'` strings; unknown future flags are skipped rather than fatal. Redirects
+are not followed unless the command passes `-L`. Requests are sent with exactly
+the headers given, plus `Host` and `Content-Length`, and bodies are replayed
+byte-for-byte. Prior art: [minreq](https://pypi.org/project/minreq/) (2015,
+Python 2) tested each field once against the full request, reporting
+individually-required fields.
 
 ## License
 
