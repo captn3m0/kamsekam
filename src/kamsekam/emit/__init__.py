@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json as jsonlib
 
-from minreq.emit.bru import to_bru
-from minreq.emit.code import (
+from kamsekam.emit.bru import to_bru
+from kamsekam.emit.code import (
     to_fetch,
     to_http,
     to_httpie,
@@ -14,10 +14,10 @@ from minreq.emit.code import (
     to_requests,
     to_wget,
 )
-from minreq.emit.curl import to_curl
-from minreq.emit.har import to_har
-from minreq.model import HttpRequest
-from minreq.oracle import Signature
+from kamsekam.emit.curl import to_curl
+from kamsekam.emit.har import to_har
+from kamsekam.model import HttpRequest
+from kamsekam.oracle import Signature
 
 FORMATS = (
     "curl",

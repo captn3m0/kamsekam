@@ -1,9 +1,9 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.12.13,<0.13"]
+build-backend = "uv_build"
 
 [project]
-name = "minimal-request"
+name = "kamsekam"
 version = "0.1.0"
 description = "Delta-debug an HTTP request down to the smallest version that still works"
 readme = "README.md"
@@ -30,17 +30,14 @@ dependencies = [
 impersonate = ["curl_cffi>=0.7"]
 
 [project.urls]
-Homepage = "https://github.com/captn3m0/minimal-request"
-Issues = "https://github.com/captn3m0/minimal-request/issues"
+Homepage = "https://github.com/captn3m0/kamsekam"
+Issues = "https://github.com/captn3m0/kamsekam/issues"
 
 [project.scripts]
-minreq = "minreq.cli:main"
+kamsekam = "kamsekam.cli:main"
 
 [dependency-groups]
 dev = ["pytest>=8", "pytest-httpserver>=1.1", "ruff>=0.6", "mypy>=1.11"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/minreq"]
 
 [tool.ruff]
 line-length = 100
@@ -52,7 +49,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "BLE"]
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src/minreq"]
+files = ["src/kamsekam"]
 
 [[tool.mypy.overrides]]
 module = ["harfile.*", "curl_cffi.*"]

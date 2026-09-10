@@ -3,13 +3,13 @@ import json
 import pytest
 from werkzeug.wrappers import Response
 
-from minreq.atoms import decompose
-from minreq.cli import main
-from minreq.minimizer import Minimizer
-from minreq.oracle import DEFAULT_MATCH, Oracle, Signature
-from minreq.parse import parse_curl
-from minreq.parse.shell import tokenize
-from minreq.transport import build_transport
+from kamsekam.atoms import decompose
+from kamsekam.cli import main
+from kamsekam.minimizer import Minimizer
+from kamsekam.oracle import DEFAULT_MATCH, Oracle, Signature
+from kamsekam.parse import parse_curl
+from kamsekam.parse.shell import tokenize
+from kamsekam.transport import build_transport
 
 
 def guarded(request):

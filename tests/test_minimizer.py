@@ -1,11 +1,11 @@
 from collections.abc import Callable
 from itertools import chain
 
-from minreq.atoms import decompose
-from minreq.minimizer import Minimizer, split_by_weight, split_evenly
-from minreq.model import HttpRequest
-from minreq.oracle import Signature
-from minreq.parse.curl import parse_curl
+from kamsekam.atoms import decompose
+from kamsekam.minimizer import Minimizer, split_by_weight, split_evenly
+from kamsekam.model import HttpRequest
+from kamsekam.oracle import Signature
+from kamsekam.parse.curl import parse_curl
 
 COMMAND = (
     "curl 'https://e.test/p?a=1&b=2&c=3' "

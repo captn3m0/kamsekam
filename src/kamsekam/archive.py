@@ -8,9 +8,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from minreq.minimizer import Result
-from minreq.model import HttpRequest
-from minreq.parse.har import parse_har
+from kamsekam.minimizer import Result
+from kamsekam.model import HttpRequest
+from kamsekam.parse.har import parse_har
 
 ARCHIVE_METHODS = ("GET",)
 

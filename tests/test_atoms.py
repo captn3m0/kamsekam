@@ -1,5 +1,5 @@
-from minreq.atoms import decompose
-from minreq.parse.curl import parse_curl
+from kamsekam.atoms import decompose
+from kamsekam.parse.curl import parse_curl
 
 COMMAND = (
     "curl 'https://e.test/p?a=1&b=2' -H 'accept: application/json, text/plain, */*' "

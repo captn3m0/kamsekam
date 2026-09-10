@@ -1,6 +1,6 @@
 import pytest
 
-from minreq.parse.shell import ShellSyntaxError, tokenize
+from kamsekam.parse.shell import ShellSyntaxError, tokenize
 
 
 def test_single_and_double_quotes():

@@ -2,7 +2,7 @@ import base64
 
 import pytest
 
-from minreq.parse.curl import CurlParseError, parse_curl
+from kamsekam.parse.curl import CurlParseError, parse_curl
 
 
 def parse(command, **kwargs):

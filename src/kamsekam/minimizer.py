@@ -6,9 +6,9 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from minreq.atoms import Atom, Decomposition, decompose
-from minreq.model import HttpRequest
-from minreq.oracle import DEFAULT_MATCH, Oracle, Signature
+from kamsekam.atoms import Atom, Decomposition, decompose
+from kamsekam.model import HttpRequest
+from kamsekam.oracle import DEFAULT_MATCH, Oracle, Signature
 
 if TYPE_CHECKING:
     import httpx2
@@ -44,12 +44,12 @@ class Result:
 
     def as_httpx2(self) -> httpx2.Request:
         """The minimised request as a typed httpx2.Request."""
-        from minreq.interop import to_httpx2
+        from kamsekam.interop import to_httpx2
 
         return to_httpx2(self.request)
 
     def original_as_httpx2(self) -> httpx2.Request:
-        from minreq.interop import to_httpx2
+        from kamsekam.interop import to_httpx2
 
         return to_httpx2(self.original)
 
@@ -205,10 +205,10 @@ def _coerce(request: Any) -> HttpRequest:
     if isinstance(request, HttpRequest):
         return request
     if isinstance(request, str | list):
-        from minreq.parse import load
+        from kamsekam.parse import load
 
         return load(request)
-    from minreq.interop import from_httpx2
+    from kamsekam.interop import from_httpx2
 
     return from_httpx2(request)
 
@@ -230,7 +230,7 @@ def minimise(
     progress: Progress | None = None,
 ) -> Result:
     """Minimise a request given as an httpx2.Request, a curl command, or the internal model."""
-    from minreq.transport import build_transport
+    from kamsekam.transport import build_transport
 
     internal = _coerce(request)
     decomposition = decompose(

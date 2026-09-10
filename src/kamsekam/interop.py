@@ -6,7 +6,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 import httpx2
 
-from minreq.model import Body, HttpRequest, Pair, classify_body
+from kamsekam.model import Body, HttpRequest, Pair, classify_body
 
 __all__ = ["from_httpx2", "to_httpx2"]
 
@@ -22,7 +22,7 @@ def to_httpx2(request: HttpRequest) -> httpx2.Request:
 
 
 def from_httpx2(request: httpx2.Request) -> HttpRequest:
-    """Take an httpx2.Request apart into atoms minreq can remove."""
+    """Take an httpx2.Request apart into atoms kamsekam can remove."""
     parts = urlsplit(str(request.url))
     base_url = urlunsplit((parts.scheme, parts.netloc, parts.path or "/", "", ""))
     query = [Pair.from_query(seg) for seg in parts.query.split("&") if seg]

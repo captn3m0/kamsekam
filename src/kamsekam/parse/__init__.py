@@ -5,10 +5,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from minreq.model import HttpRequest
-from minreq.parse.bru import BruParseError, parse_bru
-from minreq.parse.curl import CurlParseError, parse_curl
-from minreq.parse.har import HarParseError, list_entries, parse_har
+from kamsekam.model import HttpRequest
+from kamsekam.parse.bru import BruParseError, parse_bru
+from kamsekam.parse.curl import CurlParseError, parse_curl
+from kamsekam.parse.har import HarParseError, list_entries, parse_har
 
 __all__ = [
     "BruParseError",

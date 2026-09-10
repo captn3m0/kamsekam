@@ -5,8 +5,8 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 
-from minreq.model import HttpRequest
-from minreq.transport import Response, Transport, TransportError
+from kamsekam.model import HttpRequest
+from kamsekam.transport import Response, Transport, TransportError
 
 MATCH_FIELDS = ("status", "type", "size", "hash")
 DEFAULT_MATCH = ("status", "type", "hash")

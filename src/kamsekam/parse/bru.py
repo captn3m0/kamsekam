@@ -6,7 +6,7 @@ import json as jsonlib
 import re
 from urllib.parse import urlsplit, urlunsplit
 
-from minreq.model import Body, HttpRequest, Pair
+from kamsekam.model import Body, HttpRequest, Pair
 
 METHODS = ("get", "post", "put", "delete", "patch", "head", "options", "trace")
 _BLOCK = re.compile(r"^([A-Za-z0-9:_-]+)\s*\{$")

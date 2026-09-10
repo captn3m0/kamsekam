@@ -6,8 +6,8 @@ import io
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
 
-from minreq.model import HttpRequest
-from minreq.oracle import Signature
+from kamsekam.model import HttpRequest
+from kamsekam.oracle import Signature
 
 
 def to_har(request: HttpRequest, signature: Signature | None = None) -> str:
@@ -21,7 +21,7 @@ def to_har(request: HttpRequest, signature: Signature | None = None) -> str:
             mimeType=request.header_value("content-type") or "application/octet-stream",
             text=payload.decode("utf-8", "replace"),
         )
-    with harfile.open(buffer, creator=harfile.Creator(name="minreq", version="0.1.0")) as har:
+    with harfile.open(buffer, creator=harfile.Creator(name="kamsekam", version="0.1.0")) as har:
         har.add_entry(
             startedDateTime=datetime.now(timezone.utc).isoformat(),
             time=0,

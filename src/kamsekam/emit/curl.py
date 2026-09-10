@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import re
 
-from minreq.model import HttpRequest
-from minreq.parse.curl import COMPRESSED_ENCODINGS
+from kamsekam.model import HttpRequest
+from kamsekam.parse.curl import COMPRESSED_ENCODINGS
 
 _SAFE = re.compile(r"^[A-Za-z0-9_@%+=:,./^-]+$")
 _COMPRESSION_TOKENS = {"gzip", "deflate", "br", "zstd", "compress"}

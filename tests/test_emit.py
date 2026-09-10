@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from minreq.emit import FORMATS, render
-from minreq.parse import parse_bru, parse_curl, parse_har
+from kamsekam.emit import FORMATS, render
+from kamsekam.parse import parse_bru, parse_curl, parse_har
 
 COMMAND = (
     "curl -X POST 'https://e.test/p?a=1&b=2' "
@@ -67,7 +67,7 @@ def test_bru_round_trips(request_obj):
 
 
 def test_json_report_carries_the_signature(request_obj):
-    from minreq.oracle import Signature
+    from kamsekam.oracle import Signature
 
     signature = Signature(200, "text/html", 4, "d")
     document = json.loads(render("json", request_obj, signature=signature))

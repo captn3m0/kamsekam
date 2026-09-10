@@ -5,7 +5,7 @@ from __future__ import annotations
 import json as jsonlib
 from urllib.parse import urlsplit
 
-from minreq.model import HttpRequest
+from kamsekam.model import HttpRequest
 
 
 def to_bru(request: HttpRequest, name: str | None = None, seq: int = 1) -> str:

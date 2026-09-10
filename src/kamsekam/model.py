@@ -44,7 +44,7 @@ LIST_HEADERS = frozenset(
     }
 )
 
-MULTIPART_BOUNDARY = "----minreqFormBoundary7MA4YWxkTrZu0gW"
+MULTIPART_BOUNDARY = "----kamsekamFormBoundary7MA4YWxkTrZu0gW"
 
 
 def split_list_value(value: str) -> list[str]:
@@ -219,6 +219,6 @@ class HttpRequest:
         return n + 2 + (len(payload) if payload else 0)
 
     def to_curl(self, impersonate: str | None = None) -> str:
-        from minreq.emit.curl import to_curl
+        from kamsekam.emit.curl import to_curl
 
         return to_curl(self, impersonate=impersonate)

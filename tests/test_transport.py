@@ -1,8 +1,8 @@
 import pytest
 from werkzeug.wrappers import Response
 
-from minreq.parse.curl import parse_curl
-from minreq.transport import CurlCffiTransport, Httpx2Transport, TransportError, build_transport
+from kamsekam.parse.curl import parse_curl
+from kamsekam.transport import CurlCffiTransport, Httpx2Transport, TransportError, build_transport
 
 
 def test_build_transport_defaults_to_httpx2():

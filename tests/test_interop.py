@@ -1,9 +1,9 @@
 import httpx2
 import pytest
 
-from minreq.interop import from_httpx2, to_httpx2
-from minreq.minimizer import minimise
-from minreq.parse import parse_curl
+from kamsekam.interop import from_httpx2, to_httpx2
+from kamsekam.minimizer import minimise
+from kamsekam.parse import parse_curl
 
 COMMAND = (
     "curl -X POST 'https://e.test/p?a=1&b=%20c' -H 'x-key: sec ret' "

@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatch
 from typing import Any
 
-from minreq.model import Body, HttpRequest, Pair, is_list_header, split_list_value
+from kamsekam.model import Body, HttpRequest, Pair, is_list_header, split_list_value
 
 JsonPath = tuple[str | int, ...]
 

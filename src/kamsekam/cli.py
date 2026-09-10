@@ -1,4 +1,4 @@
-"""Command line entry point: minreq -- curl ..."""
+"""Command line entry point: kamsekam -- curl ..."""
 
 from __future__ import annotations
 
@@ -8,21 +8,21 @@ import os
 import sys
 from pathlib import Path
 
-from minreq import __version__
-from minreq.archive import (
+from kamsekam import __version__
+from kamsekam.archive import (
     ARCHIVE_METHODS,
     EntryOutcome,
     derive_output_path,
     load_document,
     minimise_document,
 )
-from minreq.atoms import Decomposition, decompose
-from minreq.emit import FORMATS, render
-from minreq.minimizer import Minimizer, Result
-from minreq.model import HttpRequest
-from minreq.oracle import DEFAULT_MATCH, MATCH_FIELDS, Oracle, Signature, parse_match
-from minreq.parse import load, parse_har, read_source
-from minreq.transport import Transport, TransportError, build_transport
+from kamsekam.atoms import Decomposition, decompose
+from kamsekam.emit import FORMATS, render
+from kamsekam.minimizer import Minimizer, Result
+from kamsekam.model import HttpRequest
+from kamsekam.oracle import DEFAULT_MATCH, MATCH_FIELDS, Oracle, Signature, parse_match
+from kamsekam.parse import load, parse_har, read_source
+from kamsekam.transport import Transport, TransportError, build_transport
 
 
 class UnstableBaseline(RuntimeError):
@@ -71,13 +71,13 @@ class Printer:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="minreq",
+        prog="kamsekam",
         description="Delta-debug an HTTP request down to the smallest version that still works.",
-        epilog="everything after -- is read as a curl command: minreq -- curl -H 'a: b' URL",
+        epilog="everything after -- is read as a curl command: kamsekam -- curl -H 'a: b' URL",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("input", nargs="?", help="a .har / .bru / curl file, or - for stdin")
-    parser.add_argument("--version", action="version", version=f"minreq {__version__}")
+    parser.add_argument("--version", action="version", version=f"kamsekam {__version__}")
 
     out = parser.add_argument_group("output")
     out.add_argument("-f", "--format", default=None,

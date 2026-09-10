@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 from urllib.parse import quote, urlsplit, urlunsplit
 
-from minreq.model import Body, HttpRequest, Pair, classify_body
-from minreq.parse.shell import tokenize
+from kamsekam.model import Body, HttpRequest, Pair, classify_body
+from kamsekam.parse.shell import tokenize
 
 IMPLICIT_USER_AGENT = "curl/8.7.1"
 COMPRESSED_ENCODINGS = "gzip, deflate, br, zstd"

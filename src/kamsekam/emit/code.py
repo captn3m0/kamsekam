@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json as jsonlib
 
-from minreq.emit.curl import quote
-from minreq.model import HttpRequest
+from kamsekam.emit.curl import quote
+from kamsekam.model import HttpRequest
 
 
 def _headers_dict(request: HttpRequest) -> dict[str, str]:

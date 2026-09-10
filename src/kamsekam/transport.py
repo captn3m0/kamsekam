@@ -6,8 +6,8 @@ import time
 from dataclasses import dataclass
 from typing import Any, cast
 
-from minreq.interop import to_httpx2
-from minreq.model import HttpRequest
+from kamsekam.interop import to_httpx2
+from kamsekam.model import HttpRequest
 
 DEFAULT_TIMEOUT = 30.0
 
@@ -107,7 +107,7 @@ class CurlCffiTransport(Transport):
             from curl_cffi import requests as curl_requests
         except ImportError as exc:
             raise TransportError(
-                "--impersonate needs curl_cffi: install 'minimal-request[impersonate]'"
+                "--impersonate needs curl_cffi: install 'kamsekam[impersonate]'"
             ) from exc
         self.impersonate = impersonate
         self.session: Any = curl_requests.Session(

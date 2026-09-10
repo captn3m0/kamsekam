@@ -1,4 +1,4 @@
-# minimal-request
+# kamsekam
 
 Finds the smallest version of an HTTP request that still produces the same
 response. Takes a curl command, HAR file or Bruno `.bru` file, replays it while
@@ -7,18 +7,18 @@ removing parts, and prints what is left.
 ## Install
 
 ```console
-uv tool install minimal-request                  # the minreq command
-uv tool install 'minimal-request[impersonate]'   # adds TLS fingerprinting
+uv tool install kamsekam                # the kamsekam command
+uv tool install 'kamsekam[impersonate]' # adds TLS fingerprinting
 ```
 
 ## Usage
 
 Everything after `--` is parsed as a curl command; the result goes to stdout and
-the report to stderr. Files and stdin work too: `minreq request.bru -f httpie`,
-`cat command.txt | minreq -`.
+the report to stderr. Files and stdin work too: `kamsekam request.bru -f httpie`,
+`cat command.txt | kamsekam -`.
 
 ```console
-$ minreq -- curl 'https://api.example.com/v1/me?verbose=1' \
+$ kamsekam -- curl 'https://api.example.com/v1/me?verbose=1' \
     -H 'authorization: Bearer eyJhbG...' \
     -b 'sid=9f2a; theme=dark; _ga=GA1.2.99'
   baseline  200 application/json 1483B sha256:6b86b2...
@@ -50,8 +50,8 @@ With a HAR file and no `--format` override, every `GET` entry is minimised in
 place and the rest of the archive copied unchanged.
 
 ```console
-minreq -o minimal.har session.har
-minreq session.har              # writes session-minimal.har, then -1, -2, ...
+kamsekam -o minimal.har session.har
+kamsekam session.har              # writes session-minimal.har, then -1, -2, ...
 ```
 
 ## Options
@@ -68,7 +68,7 @@ minreq session.har              # writes session-minimal.har, then -1, -2, ...
 | `--dry-run` | list atoms and exit without sending anything |
 
 An unstable baseline is detected and `--match` relaxed automatically. Run
-`minreq --help` for the remaining flags.
+`kamsekam --help` for the remaining flags.
 
 ## Library
 
@@ -78,7 +78,7 @@ curl command string and takes the same options as the CLI, `impersonate` include
 
 ```python
 import httpx2
-from minreq import minimise
+from kamsekam import minimise
 
 result = minimise(httpx2.Request("GET", url, headers={"x-a": "1"}), impersonate="chrome131")
 result.as_httpx2()   # httpx2.Request, minimised

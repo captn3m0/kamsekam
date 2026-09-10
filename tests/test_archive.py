@@ -4,9 +4,9 @@ import json
 import pytest
 from werkzeug.wrappers import Response
 
-from minreq.archive import derive_output_path, har_request_dict
-from minreq.cli import main
-from minreq.parse.curl import parse_curl
+from kamsekam.archive import derive_output_path, har_request_dict
+from kamsekam.cli import main
+from kamsekam.parse.curl import parse_curl
 
 
 def test_derive_output_path_adds_minimal_suffix(tmp_path):

@@ -6,7 +6,7 @@ import json as jsonlib
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
-from minreq.model import Body, HttpRequest, Pair
+from kamsekam.model import Body, HttpRequest, Pair
 
 SKIPPED_HEADERS = {"cookie", "content-length", "host", "connection"}
 
