@@ -12,8 +12,7 @@ uv tool install 'kamsekam[impersonate]' # adds browser impersonation using curl_
 
 ## Usage
 
-Everything after `--` is parsed as a curl command; the result goes to stdout, the
-report to stderr. Files and stdin work too: `kamsekam req.txt -f httpie`, `... | kamsekam -`.
+Everything after `--` is parsed as a curl command:
 
 ```console
 $ kamsekam -- curl 'https://data.services.jetbrains.com/products?code=TC&release.type=eap%2Crc%2Crelease&fields=distributions%2Clink%2Cname%2Creleases&_=1789067502753' \
@@ -55,6 +54,8 @@ curl 'https://data.services.jetbrains.com/products?code=TC&fields=distributions%
 The algorithm is ddmin (Zeller & Hildebrandt) [^1]. It sends
 the request hundreds of times, so use it only on idempotent requests.
 
+[^1]: https://doi.org/10.1109/32.988498 "Simplifying and Isolating Failure-Inducing Input", *IEEE Transactions on Software Engineering*"
+
 ## HAR archives
 
 With a HAR file and no `--format` override, every `GET` entry is minimised in
@@ -82,9 +83,8 @@ An unstable baseline is detected and `--match` relaxed automatically. Run
 
 ## Library
 
-Requests cross the API boundary as typed [httpx2](https://github.com/pydantic/httpx2)
-objects; Python has no equivalent of PHP's PSR-7. `minimise()` also accepts a curl
-string and takes the CLI's options. `uncurl()` is the parser on its own.
+Minimized requests are returned as `httpx2.Request` objects, but are also available
+as curl strings.
 
 ```python
 import httpx2
@@ -97,16 +97,6 @@ result.as_httpx2()   # httpx2.Request, minimised
 result.to_curl()     # command string; also result.kept / .removed / .stats
 ```
 
-## Notes
-
-All 272 flags of curl 8.22 parse, including `--compressed`, `--data-raw` and
-`$'...'` strings; unknown future flags are skipped rather than fatal. Redirects
-are not followed unless the command passes `-L`. Requests are sent with exactly
-the headers given, plus `Host` and `Content-Length`, and bodies are replayed
-byte-for-byte. Prior art: [minreq](https://pypi.org/project/minreq/) (2015,
-Python 2) tested each field once against the full request, reporting
-individually-required fields.
-
 ## License
 
-MIT
+Licensed under Unlicense
