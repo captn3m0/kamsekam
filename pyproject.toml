@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "minimal-request"
+version = "0.1.0"
+description = "Delta-debug an HTTP request down to the smallest version that still works"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Nemo", email = "claude@captnemo.in" }]
+keywords = ["http", "curl", "delta-debugging", "ddmin", "har", "bruno", "minimization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
+dependencies = [
+    "harfile>=0.4",
+    "httpx2>=2.12.0",
+]
+
+[project.optional-dependencies]
+impersonate = ["curl_cffi>=0.7"]
+
+[project.urls]
+Homepage = "https://github.com/captn3m0/minimal-request"
+Issues = "https://github.com/captn3m0/minimal-request/issues"
+
+[project.scripts]
+minreq = "minreq.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-httpserver>=1.1", "ruff>=0.6", "mypy>=1.11"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/minreq"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "BLE"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src/minreq"]
+
+[[tool.mypy.overrides]]
+module = ["harfile.*", "curl_cffi.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.uv]
+python-preference = "only-system"
+python-downloads = "never"
