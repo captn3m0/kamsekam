@@ -121,3 +121,20 @@ def test_bytes_saved_is_positive():
     decomposition = decompose(parse_curl(COMMAND, implicit_headers=False))
     result = Minimizer(decomposition, FakeOracle(needs_key_and_sid)).run()
     assert result.bytes_saved > 0
+
+
+def test_lopsided_weights_return_fewer_chunks_than_asked():
+    items = [f"a{i}" for i in range(13)]
+    weights = dict.fromkeys(items, 1) | {"a9": 400}
+    assert len(split_by_weight(items, 4, weights)) < 4
+
+
+def test_loop_terminates_even_when_the_split_stalls():
+    """Granularity is driven by n, not by how many chunks the splitter returns."""
+    decomposition = decompose(parse_curl(COMMAND, implicit_headers=False))
+    oracle = FakeOracle(needs_key_and_sid)
+    minimizer = Minimizer(decomposition, oracle)
+    minimizer.weights = dict.fromkeys(minimizer.weights, 1) | {"cookie:_ga": 10_000}
+    result = minimizer.run()
+    assert {a.id for a in result.kept} == {"header:x-key", "cookie:sid"}
+    assert result.stats.tests < 500
